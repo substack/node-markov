@@ -12,7 +12,7 @@
         "example" : "./example"
     },
     "scripts" : {
-        "test" : "expresso"
+        "test": "tape test/*.js"
     },
     "engines" : {
         "node" : ">=0.4.0"
@@ -23,7 +23,7 @@
         "hashish" : ">=0.0.2"
     },
     "devDependencies" : {
-        "expresso" : ">=0.7.0"
+        "tape": "~1.1.1"
     },
     "license" : "MIT/X11",
     "author" : {
