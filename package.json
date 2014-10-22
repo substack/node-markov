@@ -1,34 +1,35 @@
 {
-    "name" : "markov",
-    "description" : "Silly markov chatbot module",
-    "version" : "0.0.7",
-    "repository" : {
-        "type" : "git",
-        "url" : "git://github.com/substack/node-markov.git"
-    },
-    "main" : "./index.js",
-    "directories" : {
-        "lib" : ".",
-        "example" : "./example"
-    },
-    "scripts" : {
-        "test": "tape test/*.js"
-    },
-    "engines" : {
-        "node" : ">=0.4.0"
-    },
-    "dependencies" : {
-        "deck" : ">=0.0.3",
-        "lazy" : ">=1.0.3",
-        "hashish" : ">=0.0.2"
-    },
-    "devDependencies" : {
-        "tape": "~1.1.1"
-    },
-    "license" : "MIT",
-    "author" : {
-        "name" : "James Halliday",
-        "email" : "mail@substack.net",
-        "url" : "http://substack.net"
-    }
+  "name": "markov",
+  "description": "Silly markov chatbot module",
+  "version": "0.0.7",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/substack/node-markov.git"
+  },
+  "main": "./index.js",
+  "directories": {
+    "lib": ".",
+    "example": "./example"
+  },
+  "scripts": {
+    "test": "tape test/*.js"
+  },
+  "engines": {
+    "node": ">=0.4.0"
+  },
+  "dependencies": {
+    "deck": ">=0.0.3",
+    "lazy": ">=1.0.3",
+    "hashish": ">=0.0.2",
+    "q": "~1.0.1"
+  },
+  "devDependencies": {
+    "tape": "~1.1.1"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "James Halliday",
+    "email": "mail@substack.net",
+    "url": "http://substack.net"
+  }
 }

@@ -11,33 +11,33 @@ qwantz
 
 qwantz.js:
 
-    var util = require('util');
-    var fs = require('fs');
+  var util = require('util');
+  var fs = require('fs');
+  
+  var Markov = require('markov');
+  var m = new Markov(1);
+  
+  var s = fs.createReadStream(__dirname + '/qwantz.txt');
+  m.seed(s, function () {
+    var stdin = process.openStdin();
+    util.print('> ');
     
-    var markov = require('markov');
-    var m = markov(1);
-    
-    var s = fs.createReadStream(__dirname + '/qwantz.txt');
-    m.seed(s, function () {
-        var stdin = process.openStdin();
-        util.print('> ');
-        
-        stdin.on('data', function (line) {
-            var res = m.respond(line.toString()).join(' ');
-            console.log(res);
-            util.print('> ');
-        });
+    stdin.on('data', function (line) {
+      var res = m.respond(line.toString()).join(' ');
+      console.log(res);
+      util.print('> ');
     });
+  });
 
 output:
 
-    $ node example/qwantz.js 
-    > Hello friend.
-    Oh, that hurts me. How could fall apart, not unlike this tiny house. remains a danger when you? As I see him (quite often, Yes, As Thank I you? take have on! forgotten male, That oppression is is a A friend
-    > That is troubling news!
-    I've I had must to guard do against with such the a irony part of of their their fundamental fundamental injustices.
-    > Justice eh? SOMEBODY LIGHT UP THE BATSIGNAL
-    crazy I Utahraptor feel slipped alot in better! your about problems the put future! behind full You? of go My down perspective. The
+  $ node example/qwantz.js 
+  > Hello friend.
+  Oh, that hurts me. How could fall apart, not unlike this tiny house. remains a danger when you? As I see him (quite often, Yes, As Thank I you? take have on! forgotten male, That oppression is is a A friend
+  > That is troubling news!
+  I've I had must to guard do against with such the a irony part of of their their fundamental fundamental injustices.
+  > Justice eh? SOMEBODY LIGHT UP THE BATSIGNAL
+  crazy I Utahraptor feel slipped alot in better! your about problems the put future! behind full You? of go My down perspective. The
 
 methods
 =======
