@@ -9,12 +9,6 @@ function Markov(order) {
   this.db = {};
 }
   
-/**
- * TODO
- * add import/export of json
- * add incremental updates of model
- * use promises
- */
 Markov.prototype.seed = function(seed) {
   var defer = Q.defer();
 
@@ -186,7 +180,7 @@ Markov.prototype.export = function() {
 
 Markov.prototype.import = function(json) {
   var data = JSON.parse(json);
-  _.extend(this, _.pick(json, ['db', 'order']));
+  _.extend(this, _.pick(data, ['db', 'order']));
 };
 
 Markov.prototype.addDefaultDbRow = function(word) {
