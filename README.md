@@ -18,7 +18,7 @@ qwantz.js:
   var m = new Markov(1);
   
   var s = fs.createReadStream(__dirname + '/qwantz.txt');
-  m.seed(s, function () {
+  m.train(s).then(function () {
     var stdin = process.openStdin();
     util.print('> ');
     
@@ -42,24 +42,24 @@ output:
 methods
 =======
 
-markov(order)
--------------
+new Markov(order)
+-----------------
 
 Create a new markov object of order `order`, which defaults to 2.
 
-.seed(s, cb)
-------------
+.train(s)
+---------
 
-Seed the markov object with a string or stream `s`.
+Train the markov object with a string or stream `s`.
 
 If `s` is a string, transition probabilities will be updated for every grouping
 of the previously specified order with dangling links at the front and end in
 the appropriate direction.
 
-If `s`s is a stream, data events will be line-buffered and fed into `.seed()` again
+If `s`s is a stream, data events will be line-buffered and fed into `.train()` again
 line-by-line.
 
-If `cb` is specified it will fire once the seed text is fully ingested.
+Returns a `Q` promise.
 
 .search(text)
 -------------
@@ -79,7 +79,7 @@ Choose a key at random.
 Find a key likely to follow after `key`.
 
 Returns a hash with keys `key`, the canonical next key and `word`, a raw form of
-`key` as it appeared in the seed text.
+`key` as it appeared in the training text.
 
 .prev(key)
 ----------
@@ -87,7 +87,7 @@ Returns a hash with keys `key`, the canonical next key and `word`, a raw form of
 Find a key likely to come before `key`.
 
 Returns a hash with keys `key`, the canonical next key and `word`, a raw form of
-`key` as it appeared in the seed text.
+`key` as it appeared in the training text.
 
 .forward(key, limit)
 --------------------

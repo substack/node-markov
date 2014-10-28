@@ -9,25 +9,25 @@ function Markov(order) {
   this.db = {};
 }
   
-Markov.prototype.seed = function(seed) {
+Markov.prototype.train = function(str) {
   var defer = Q.defer();
 
-  if (seed instanceof EventEmitter) {
-    Lazy(seed).lines.forEach(this.seedString.bind(this));
+  if (str instanceof EventEmitter) {
+    Lazy(str).lines.forEach(this.trainString.bind(this));
     
-    seed.on('error', defer.reject.bind(defer));
-    seed.on('end', defer.resolve.bind(defer));
+    str.on('error', defer.reject.bind(defer));
+    str.on('end', defer.resolve.bind(defer));
   }
   else {
-    this.seedString(seed);
+    this.trainString(str);
     defer.resolve();
   }
 
   return defer.promise;
 };
 
-Markov.prototype.seedString = function(seed) {
-  var text = (Buffer.isBuffer(seed) ? seed.toString() : seed)
+Markov.prototype.trainString = function(str) {
+  var text = (Buffer.isBuffer(str) ? str.toString() : str)
   var words = text.split(/\s+/);
   var links = [];
 
