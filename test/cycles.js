@@ -10,7 +10,7 @@ test('cycles', function(t) {
   var m = new Markov(1);
 
   var these = 'the THE tHe ThE thE The';
-  m.seed(these).then(function() {
+  m.train(these).then(function() {
     clearTimeout(to);
 
     var counts = {};

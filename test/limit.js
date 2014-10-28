@@ -10,7 +10,7 @@ test('limit', function(t) {
   var m = new Markov(1);
 
   var these = 'the THE tHe ThE thE The the THE The tHE the the';
-  m.seed(these).then(function() {
+  m.train(these).then(function() {
     clearTimeout(to);
 
     var counts = {};

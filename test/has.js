@@ -10,7 +10,7 @@ test('has', function(t) {
   var m = new Markov(1);
 
   var these = 'constructor toLocaleString valueOf __defineGetter__';
-  m.seed(these).then(function() {
+  m.train(these).then(function() {
     clearTimeout(to);
 
     var counts = {};

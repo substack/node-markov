@@ -11,7 +11,7 @@ test('stream', function(t) {
   }, 5000);
 
   var em = new EventEmitter;
-  m.seed(em).then(function() {
+  m.train(em).then(function() {
     clearTimeout(to);
 
     var counts = {};

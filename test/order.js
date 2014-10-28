@@ -5,7 +5,7 @@ test('order1', function(t) {
   t.plan(5);
 
   var m = new Markov(1);
-  m.seed('This is a test.');
+  m.train('This is a test.');
 
   t.equal(
     m.search('What IS your problem?'),
@@ -30,7 +30,7 @@ test('order2', function(t) {
   t.plan(2);
 
   var m = new Markov(2);
-  m.seed('This is a test.');
+  m.train('This is a test.');
   t.deepEqual(
     m.next('this_is'),
     { word : 'a test.', key : 'a_test' }
