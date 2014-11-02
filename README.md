@@ -15,18 +15,18 @@ qwantz.js:
   var fs = require('fs');
   
   var Markov = require('markov');
-  var m = new Markov(1);
+  var m = new Markov();
   
-  var s = fs.createReadStream(__dirname + '/qwantz.txt');
-  m.train(s).then(function () {
-    var stdin = process.openStdin();
+  var s = fs.readSync(__dirname + '/qwantz.txt');
+  m.train(s);
+
+  var stdin = process.openStdin();
+  util.print('> ');
+  
+  stdin.on('data', function (line) {
+    var res = m.respond(line.toString()).join(' ');
+    console.log(res);
     util.print('> ');
-    
-    stdin.on('data', function (line) {
-      var res = m.respond(line.toString()).join(' ');
-      console.log(res);
-      util.print('> ');
-    });
   });
 
 output:
@@ -51,15 +51,6 @@ Create a new markov object of order `order`, which defaults to 2.
 ---------
 
 Train the markov object with a string or stream `s`.
-
-If `s` is a string, transition probabilities will be updated for every grouping
-of the previously specified order with dangling links at the front and end in
-the appropriate direction.
-
-If `s`s is a stream, data events will be line-buffered and fed into `.train()` again
-line-by-line.
-
-Returns a `Q` promise.
 
 .search(text)
 -------------
@@ -88,24 +79,6 @@ Find a key likely to come before `key`.
 
 Returns a hash with keys `key`, the canonical next key and `word`, a raw form of
 `key` as it appeared in the training text.
-
-.forward(key, limit)
---------------------
-
-Generate a markov chain forward starting at `key` and returning an array of the
-raw word forms along the way.
-
-Stop when the traversal hits a terminal entry or when limit words have been
-generated if limit is specified.
-
-.backward(key, limit)
----------------------
-
-Generate a markov chain backward starting at `key` and returning an array of the
-raw word forms along the way.
-
-Stop when the traversal hits a terminal entry or when limit words have been
-generated if limit is specified.
 
 .fill(key, limit)
 -----------------

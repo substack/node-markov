@@ -1,83 +1,68 @@
 var EventEmitter = require('events').EventEmitter;
 var deck = require('deck');
-var Lazy = require('lazy');
-var Q = require('q');
 var _ = require('underscore');
 
-function Markov(order) {
-  this.order = order || 2;
+function Markov(minimumWords) {
+  this.minimumWords = minimumWords || 1;
   this.db = {};
 }
   
 Markov.prototype.train = function(str) {
-  var defer = Q.defer();
-
-  if (str instanceof EventEmitter) {
-    Lazy(str).lines.forEach(this.trainString.bind(this));
-    
-    str.on('error', defer.reject.bind(defer));
-    str.on('end', defer.resolve.bind(defer));
-  }
-  else {
-    this.trainString(str);
-    defer.resolve();
-  }
-
-  return defer.promise;
-};
-
-Markov.prototype.trainString = function(str) {
   var text = (Buffer.isBuffer(str) ? str.toString() : str)
   var words = text.split(/\s+/);
-  var links = [];
 
-  for (var i = 0; i < words.length; i += this.order) {
-    var link = words.slice(i, i + this.order).join(' ');
-    links.push(link);
-  }
+  if (words.length >= this.minimumWords) {
+    for (var i = 0; i < words.length; i++) {
+      var word = words[i];
+      var cleanWord = clean(word);
 
-  if (links.length > 1) {
-    for (var i = 1; i < links.length; i++) {
-      var word = links[i-1];
-      var cword = clean(word);
-      var next = links[i];
-      var cnext = clean(next);
+      var next = words[i + 1];
+      var prev = words[i - 1];
+
+      var cleanNext;
+      var cleanPrev;
       
-      var node = this.addDefaultDbRow(cword);
+      var node = this.addDefaultDbRow(cleanWord);
 
       node.count++;
-      node.words[word] = _.isNumber(node.words[word]) ? node.words[word] + 1 : 1;
-      node.next[cnext] = _.isNumber(node.next[cnext]) ? node.next[cnext] + 1 : 1;
+      node.weight = this.computeWeight(node.count);
 
-      if (i > 1) {
-        var prev = clean(links[i-2]);
-        node.prev[prev] = _.isNumber(node.prev[prev]) ? node.prev[prev] + 1 : 1;
+      if (next) {
+        cleanNext = clean(next);
+        node.next[cleanNext] = _.isNumber(node.next[cleanNext]) ? node.next[cleanNext] + 1 : 1;
+      }
+      else {
+        node.next[''] = _.isNumber(node.next['']) ? node.next[''] + 1 : 1;
+      }
+
+      if (prev) {
+        cleanPrev = clean(prev);
+        node.prev[cleanPrev] = _.isNumber(node.prev[cleanPrev]) ? node.prev[cleanPrev] + 1 : 1;
       }
       else {
         node.prev[''] = _.isNumber(node.prev['']) ? node.prev[''] + 1 : 1;
       }
     }
-    
-    var n = this.addDefaultDbRow(cnext);
-
-    n.count++;
-    n.words[next] = _.isNumber(n.words[next]) ? n.words[next] + 1 : 1;
-    n.prev[cword] = _.isNumber(n.prev[cword]) ? n.prev[cword] + 1 : 1;
-    n.next[''] = _.isNumber(n.next['']) ? n.next[''] + 1 : 1;
   }
+};
+
+Markov.prototype.computeWeight = function(count) {
+  return Math.log(count) + 1;
 };
 
 Markov.prototype.search = function(text) {
   var words = text.split(/\s+/);
   
-  // find a starting point...
+  //find a starting point...
   var start = null;
   var groups = {};
-  for (var i = 0; i < words.length; i += this.order) {
-    var word = clean(words.slice(i, i + this.order).join(' '));
+  var cleanWord;
 
-    if (this.db[word] !== undefined) {
-      groups[word] = this.db[word].count;
+  for (var i = 0; i < words.length; i++) {
+    cleanWord = clean(words[i]);
+
+    if (this.db[cleanWord] !== undefined) {
+      groups[cleanWord] = this.db[cleanWord].weight;
     }
   }
   
@@ -88,99 +73,78 @@ Markov.prototype.pick = function() {
   return deck.pick(Object.keys(this.db))
 };
 
-Markov.prototype.next = function(cur) {
-  if (!cur || !this.db[cur]) return undefined;
-  
-  var next = deck.pick(this.db[cur].next);
-  return next && {
-    key: next,
-    word: deck.pick(this.db[next].words),
-  } || undefined;
-};
-
-Markov.prototype.prev = function(cur) {
-  if (!cur || !this.db[cur]) return undefined;
-  
-  var prev = deck.pick(this.db[cur].prev);
-  return prev && {
-    key: prev,
-    word: deck.pick(this.db[prev].words),
-  } || undefined;
-};
-
-Markov.prototype.forward = function(cur, limit) {
-  var res = [];
-  while (cur && !limit || res.length < limit) {
-    var next = this.next(cur);
-    if (!next) break;
-    cur = next.key;
-    res.push(next.word);
+Markov.prototype.next = function(word) {
+  if (!word || !this.db[word]) {
+    return undefined;
   }
   
-  return res;
+  return deck.pick(this.db[word].next);
 };
 
-Markov.prototype.backward = function(cur, limit) {
-  var res = [];
-  while (cur && !limit || res.length < limit) {
-    var prev = this.prev(cur);
-    if (!prev) break;
-    cur = prev.key;
-    res.unshift(prev.word);
+Markov.prototype.prev = function(word) {
+  if (!word || !this.db[word]) {
+    return undefined;
   }
   
-  return res;
+  return deck.pick(this.db[word].prev);
 };
 
-Markov.prototype.fill = function(cur, limit) {
-  var res = [ deck.pick(this.db[cur].words) ];
-  if (!res[0]) return [];
-  if (limit && res.length >= limit) return res;
+Markov.prototype.fill = function(word, limit) {
+  var response = [deck.pick(this.db[word].words)];
+
+  if (!response[0]) {
+    return [];
+  }
+
+  if (limit && response.length >= limit) {
+    return response;
+  }
   
-  var pcur = cur;
-  var ncur = cur;
+  var previousWord = word;
+  var nextWord = word;
   
-  while (pcur || ncur) {
-    if (pcur) {
-      var prev = this.prev(pcur);
-      pcur = null;
-      if (prev) {
-        pcur = prev.key;
-        res.unshift(prev.word);
-        if (limit && res.length >= limit) break;
+  while (previousWord || nextWord) {
+    if (previousWord) {
+      previousWord = this.prev(previousWord);
+
+      if (previousWord) {
+        response.unshift(previousWord);
+
+        if (limit && response.length >= limit) {
+          break;
+        }
       }
     }
     
-    if (ncur) {
-      var next = this.next(ncur);
-      ncur = null;
-      if (next) {
-        ncur = next.key;
-        res.unshift(next.word);
-        if (limit && res.length >= limit) break;
+    if (nextWord) {
+      nextWord = this.next(nextWord);
+
+      if (nextWord) {
+        response.push(nextWord);
+
+        if (limit && response.length >= limit) {
+          break;
+        }
       }
     }
   }
   
-  return res;
+  //TODO punctuation?
+  return response.join(' ');
 };
 
 Markov.prototype.respond = function(text, limit) {
-  var cur = this.search(text) || this.pick();
-  return this.fill(cur, limit);
-};
-
-Markov.prototype.word = function(cur) {
-  return this.db[cur] && deck.pick(this.db[cur].words);
+  var word = this.search(text) || this.pick();
+  return this.fill(word, limit);
 };
 
 Markov.prototype.export = function() {
-  return JSON.stringify(_.pick(this, ['db', 'order']));
+  return JSON.stringify(_.pick(this, ['db', 'minimumWords']));
 }
 
 Markov.prototype.import = function(json) {
   var data = JSON.parse(json);
-  _.extend(this, _.pick(data, ['db', 'order']));
+  _.extend(this, _.pick(data, ['db', 'minimumWords']));
 };
 
 Markov.prototype.addDefaultDbRow = function(word) {

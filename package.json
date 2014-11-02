@@ -19,8 +19,6 @@
   },
   "dependencies": {
     "deck": ">=0.0.3",
-    "lazy": ">=1.0.3",
-    "q": "~1.0.1",
     "underscore": "~1.7.0"
   },
   "devDependencies": {
