@@ -41,6 +41,8 @@ Markov.prototype.train = function(str) {
       }
     }
   }
+
+  return this;
 };
 
 //compute a node's weight using its count. uses ln(count) to prevent some nodes from being highly favored
@@ -163,6 +165,7 @@ Markov.prototype.export = function() {
 Markov.prototype.import = function(json) {
   var data = JSON.parse(json);
   _.extend(this, _.pick(data, ['model', 'minimumWords']));
+  return this;
 };
 
 //create a default node in the model
