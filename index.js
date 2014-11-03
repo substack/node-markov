@@ -15,6 +15,7 @@ Markov.prototype.train = function(str) {
   var prev;
   var node;
 
+  //ignore text with fewer than `minimumWords` words
   if (words.length >= this.minimumWords) {
     for (var i = 0; i < words.length; i++) {
       word = words[i];
@@ -52,7 +53,7 @@ Markov.prototype.computeWeight = function(count) {
 
 //break a string into words, and remove punctuation, etc.
 Markov.prototype.wordsFromText = function(text) {
-  return _.map(text.toString().split(/\s+/), clean);
+  return clean(text.toString()).toLowerCase().split(/\s+/);
 };
 
 //pick a word from the model, favoring words that appear in `text`
@@ -190,11 +191,7 @@ Markov.prototype.incrementCount = function(obj) {
 
 //clean a string
 function clean(s) {
-  return s
-    .toLowerCase()
-    .replace(/[^a-z\d]+/g, '_')
-    .replace(/^_/, '')
-    .replace(/_$/, '');
+  return s.replace(/[^a-z\d ]+/ig, '')
 }
 
 //default node

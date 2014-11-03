@@ -12,7 +12,7 @@
     "example": "./example"
   },
   "scripts": {
-    "test": "tape test/*.js"
+    "test": "./node_modules/.bin/mocha -R spec ./test/index.js"
   },
   "engines": {
     "node": ">=0.10.0"
@@ -21,7 +21,8 @@
     "underscore": "~1.7.0"
   },
   "devDependencies": {
-    "tape": "~1.1.1"
+    "chai": "~1.9.2",
+    "mocha": "~2.0.1"
   },
   "license": "MIT",
   "contributors": [

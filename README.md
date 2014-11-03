@@ -39,49 +39,41 @@ output:
   > Justice eh? SOMEBODY LIGHT UP THE BATSIGNAL
   crazy I Utahraptor feel slipped alot in better! your about problems the put future! behind full You? of go My down perspective. The
 
-methods
-=======
+## methods
 
-new Markov(order)
------------------
+### new Markov(minimumWords)
 
-Create a new markov object of order `order`, which defaults to 2.
+Create a new markov object. Optionally set `minimumWords` (default 1).
 
-.train(s)
----------
+### .train(text)
 
-Train the markov object with a string or stream `s`.
+Train the markov object with a string `text`, ignoring text with fewer than `minimumWords` words.
 
-.search(text)
--------------
+### .search(text)
 
 Search for and return some key found in the text body `text`.
 
 Return `undefined` if no matches were found.
 
-.pickWord(nodes, words)
--------
+### .pickWord(nodes, words)
 
 Choose a word at random from `nodes`, optionally favoring words in `words`.
 
-.next(key)
-----------
+### .next(key)
 
 Find a key likely to follow after `key`.
 
 Returns a hash with keys `key`, the canonical next key and `word`, a raw form of
 `key` as it appeared in the training text.
 
-.prev(key)
-----------
+### .prev(key)
 
 Find a key likely to come before `key`.
 
 Returns a hash with keys `key`, the canonical next key and `word`, a raw form of
 `key` as it appeared in the training text.
 
-.fill(key, limit)
------------------
+### .fill(key, limit)
 
 Generate a markov chain in both directions starting at `key`. Return an array of
 the raw word forms along the way including the raw word form of the supplied
@@ -90,7 +82,6 @@ the raw word forms along the way including the raw word form of the supplied
 Stop when the traversal hits a terminal entry or when limit words have been
 generated if limit is specified.
 
-.respond(text, limit)
----------------------
+### .respond(text, limit)
 
 Search for a starting key in `text` and then call `.fill(key, limit)` on it.

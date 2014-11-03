@@ -1,34 +1,18 @@
-var test = require('tape');
+var chai = require('chai');
 var Markov = require('../');
-var fs = require('fs');
 
-test('has', function(t) {
-  var to = setTimeout(function() {
-    t.fail('never finished');
-  }, 5000);
+var expect = chai.expect;
 
-  var m = new Markov(1);
+describe('special property names', function() {
+  var m = new Markov();
 
   var these = 'constructor toLocaleString valueOf __defineGetter__';
-  m.train(these).then(function() {
-    clearTimeout(to);
 
-    var counts = {};
-    for (var i = 0; i < 100; i++) {
-      var res = m.respond('the', 100);
-      t.ok(res.length < 100);
+  it('should train', function() {
+    expect(m.train(these)).to.exist;
+  });
 
-      res.forEach(function (r) {
-        t.ok(these.split(' ').indexOf(r) >= 0);
-        counts[r] = (counts[r] || 0) + 1;
-      });
-    }
-
-    t.deepEqual(
-      Object.keys(counts).sort(),
-      these.split(' ').sort()
-    );
-
-    t.end();
-  }, t.fail.bind(t));
+  it('should respond', function() {
+    expect(m.respond('the')).to.exist;
+  });
 });
