@@ -189,11 +189,11 @@ function defaultDbRow() {
   };
 }
 
-function mapObject(obj, fn) {
+function mapObject(list, fn) {
   var ret = {};
 
-  _.each(obj, function(val, key) {
-    ret[key] = fn(val, key);
+  _.each(list, function(val, idx) {
+    ret[val] = fn(val, idx);
   });
 
   return ret;
