@@ -59,10 +59,10 @@ Search for and return some key found in the text body `text`.
 
 Return `undefined` if no matches were found.
 
-.pick()
+.pickWord(nodes, words)
 -------
 
-Choose a key at random.
+Choose a word at random from `nodes`, optionally favoring words in `words`.
 
 .next(key)
 ----------

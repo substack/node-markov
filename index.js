@@ -1,5 +1,3 @@
-var EventEmitter = require('events').EventEmitter;
-var deck = require('deck');
 var _ = require('underscore');
 
 function Markov(minimumWords) {
@@ -7,40 +5,39 @@ function Markov(minimumWords) {
   this.db = {};
 }
   
+//TODO comments
 Markov.prototype.train = function(str) {
   var text = (Buffer.isBuffer(str) ? str.toString() : str)
-  var words = text.split(/\s+/);
+  var words = this.wordsFromText(text);
+
+  var word;
+  var next;
+  var prev;
+  var node;
 
   if (words.length >= this.minimumWords) {
     for (var i = 0; i < words.length; i++) {
-      var word = words[i];
-      var cleanWord = clean(word);
+      word = words[i];
+      next = words[i + 1];
+      prev = words[i - 1];
 
-      var next = words[i + 1];
-      var prev = words[i - 1];
+      node = this.addDefaultDbRow(word);
 
-      var cleanNext;
-      var cleanPrev;
-      
-      var node = this.addDefaultDbRow(cleanWord);
+      this.incrementCount(node);
 
-      node.count++;
-      node.weight = this.computeWeight(node.count);
-
+      //TODO somehow combine generic language dataset with user dataset. e.g. start with generic dataset, then give user data larger weights...
       if (next) {
-        cleanNext = clean(next);
-        node.next[cleanNext] = _.isNumber(node.next[cleanNext]) ? node.next[cleanNext] + 1 : 1;
+        node.next[next] = this.incrementCount(node.next[next]);
       }
       else {
-        node.next[''] = _.isNumber(node.next['']) ? node.next[''] + 1 : 1;
+        node.next[''] = this.incrementCount(node.next['']);
       }
 
       if (prev) {
-        cleanPrev = clean(prev);
-        node.prev[cleanPrev] = _.isNumber(node.prev[cleanPrev]) ? node.prev[cleanPrev] + 1 : 1;
+        node.prev[prev] = this.incrementCount(node.prev[prev]);
       }
       else {
-        node.prev[''] = _.isNumber(node.prev['']) ? node.prev[''] + 1 : 1;
+        node.prev[''] = this.incrementCount(node.prev['']);
       }
     }
   }
@@ -50,27 +47,38 @@ Markov.prototype.computeWeight = function(count) {
   return Math.log(count) + 1;
 };
 
-Markov.prototype.search = function(text) {
-  var words = text.split(/\s+/);
-  
-  //find a starting point...
-  var start = null;
-  var groups = {};
-  var cleanWord;
-
-  for (var i = 0; i < words.length; i++) {
-    cleanWord = clean(words[i]);
-
-    if (this.db[cleanWord] !== undefined) {
-      groups[cleanWord] = this.db[cleanWord].weight;
-    }
-  }
-  
-  return deck.pick(groups);
+Markov.prototype.wordsFromText = function(text) {
+  return _.map(text.toString().split(/\s+/), clean);
 };
 
-Markov.prototype.pick = function() {
-  return deck.pick(Object.keys(this.db))
+Markov.prototype.search = function(text) {
+  return this.pickWord(this.db, this.wordsFromText(text));
+};
+  
+Markov.prototype.pickWord = function(nodes, words) {
+  if (words) {
+    words = _.intersection(_.keys(nodes), words)
+  }
+  else {
+    words = [];
+  }
+
+  var wordsTable = mapObject(words, _.constant(true));
+
+  var maxSample = 0;
+  var sample;
+
+  return _.reduce(_.keys(nodes), function(memo, word) {
+    //TODO tweak
+    sample = Math.random() * nodes[word].weight * (wordsTable[word] ? 2 : 1);
+
+    if (sample > maxSample) {
+      memo = word;
+      maxSample = sample;
+    }
+
+    return memo;
+  }, null);
 };
 
 Markov.prototype.next = function(word) {
@@ -78,7 +86,7 @@ Markov.prototype.next = function(word) {
     return undefined;
   }
   
-  return deck.pick(this.db[word].next);
+  return this.pickWord(this.db[word].next);
 };
 
 Markov.prototype.prev = function(word) {
@@ -86,11 +94,11 @@ Markov.prototype.prev = function(word) {
     return undefined;
   }
   
-  return deck.pick(this.db[word].prev);
+  return this.pickWord(this.db[word].prev);
 };
 
 Markov.prototype.fill = function(word, limit) {
-  var response = [deck.pick(this.db[word].words)];
+  var response = [word];
 
   if (!response[0]) {
     return [];
@@ -134,8 +142,8 @@ Markov.prototype.fill = function(word, limit) {
 };
 
 Markov.prototype.respond = function(text, limit) {
-  var word = this.search(text) || this.pick();
-  return this.fill(word, limit);
+  limit = limit || 25;
+  return this.fill(this.search(text), limit);
 };
 
 Markov.prototype.export = function() {
@@ -156,6 +164,15 @@ Markov.prototype.addDefaultDbRow = function(word) {
   return this.db[word];
 };
 
+Markov.prototype.incrementCount = function(obj) {
+  obj = _.isObject(obj) ? obj : {count: 0, weight: 0};
+
+  obj.count++;
+  obj.weight = this.computeWeight(obj.count);
+
+  return obj;
+};
+
 function clean(s) {
   return s
     .toLowerCase()
@@ -167,10 +184,19 @@ function clean(s) {
 function defaultDbRow() {
   return {
     count: 0,
-    words: {},
     next: {},
     prev: {}
   };
-};
+}
+
+function mapObject(obj, fn) {
+  var ret = {};
+
+  _.each(obj, function(val, key) {
+    ret[key] = fn(val, key);
+  });
+
+  return ret;
+}
 
 module.exports = Markov;
