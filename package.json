@@ -1,7 +1,7 @@
 {
   "name": "markov-respond",
   "description": "Silly markov chatbot module",
-  "version": "4.0.1",
+  "version": "5.0.0",
   "repository": {
     "type": "git",
     "url": "git://github.com/b3nj4m/node-markov.git"
