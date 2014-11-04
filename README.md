@@ -41,9 +41,9 @@ output:
 
 ## methods
 
-### new Markov(minimumWords)
+### new Markov(minimumWords, caseSensitive, stripPunctuation)
 
-Create a new markov object. Optionally set `minimumWords` (default 1).
+Create a new markov object. Optionally set `minimumWords` (default 1), `caseSensitive` (default false), `stripPunctuation` (default false).
 
 ### .train(text)
 
