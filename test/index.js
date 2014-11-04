@@ -6,4 +6,5 @@ describe('the tests', function() {
   require('./has');
   require('./limit');
   require('./order');
+  require('./case');
 });
