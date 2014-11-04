@@ -1,7 +1,9 @@
 var _ = require('underscore');
 
-function Markov(minimumWords) {
+function Markov(minimumWords, caseSensitive, stripPunctuation) {
   this.minimumWords = minimumWords || 1;
+  this.caseSensitive = !!caseSensitive;
+  this.stripPunctuation = !!stripPunctuation;
   this.model = {};
 }
   
@@ -53,7 +55,17 @@ Markov.prototype.computeWeight = function(count) {
 
 //break a string into words, and remove punctuation, etc.
 Markov.prototype.wordsFromText = function(text) {
-  return clean(text.toString()).toLowerCase().split(/\s+/);
+  text = text.toString();
+
+  if (!this.caseSensitive) {
+    text = text.toLowerCase();
+  }
+
+  if (this.stripPunctuation) {
+    text = clean(text);
+  }
+
+  return text.split(/\s+/);
 };
 
 //pick a word from the model, favoring words that appear in `text`
