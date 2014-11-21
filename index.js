@@ -169,15 +169,14 @@ Markov.prototype.respond = function(text, limit) {
   return this.fill(this.search(text), limit);
 };
 
-//export the current model and settings as a JSON string
+//export the current model as an object
 Markov.prototype.export = function() {
-  return JSON.stringify(_.pick(this, ['model', 'minimumWords']));
+  return _.pick(this, ['model', 'minimumWords']);
 }
 
-//import model and settings from a JSON string
+//import model from an object
 Markov.prototype.import = function(json) {
-  var data = JSON.parse(json);
-  _.extend(this, _.pick(data, ['model', 'minimumWords']));
+  _.extend(this, _.pick(json, ['model', 'minimumWords']));
   return this;
 };
 
