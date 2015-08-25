@@ -168,7 +168,7 @@ module.exports = function (order) {
                 ncur = null;
                 if (next) {
                     ncur = next.key;
-                    res.unshift(next.word);
+                    res.push(next.word);
                     if (limit && res.length >= limit) break;
                 }
             }
