@@ -1,34 +1,32 @@
 {
-    "name" : "markov",
-    "description" : "Silly markov chatbot module",
-    "version" : "0.0.7",
-    "repository" : {
-        "type" : "git",
-        "url" : "git://github.com/substack/node-markov.git"
-    },
-    "main" : "./index.js",
-    "directories" : {
-        "lib" : ".",
-        "example" : "./example"
-    },
-    "scripts" : {
-        "test": "tape test/*.js"
-    },
-    "engines" : {
-        "node" : ">=0.4.0"
-    },
-    "dependencies" : {
-        "deck" : ">=0.0.3",
-        "lazy" : ">=1.0.3",
-        "hashish" : ">=0.0.2"
-    },
-    "devDependencies" : {
-        "tape": "~1.1.1"
-    },
-    "license" : "MIT",
-    "author" : {
-        "name" : "James Halliday",
-        "email" : "mail@substack.net",
-        "url" : "http://substack.net"
-    }
+  "name": "markov-respond",
+  "description": "Silly markov chatbot module",
+  "version": "7.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/b3nj4m/node-markov.git"
+  },
+  "main": "./index.js",
+  "directories": {
+    "lib": ".",
+    "example": "./example"
+  },
+  "scripts": {
+    "test": "./node_modules/.bin/mocha -R spec ./test/index.js"
+  },
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "dependencies": {
+    "underscore": "~1.7.0"
+  },
+  "devDependencies": {
+    "chai": "~1.9.2",
+    "mocha": "~2.0.1"
+  },
+  "license": "MIT",
+  "contributors": [
+    "James Halliday <mail@substack.net>"
+  ],
+  "author": "Ben Robbins <ben.robbins@gmail.com>"
 }
