@@ -147,7 +147,7 @@ module.exports = function (order) {
     self.fill = function (cur, limit) {
         var res = [ deck.pick(db[cur].words) ];
         if (!res[0]) return [];
-        if (limit && res.length >= limit) return res;;
+        if (limit && res.length >= limit) return res;
         
         var pcur = cur;
         var ncur = cur;
@@ -168,7 +168,7 @@ module.exports = function (order) {
                 ncur = null;
                 if (next) {
                     ncur = next.key;
-                    res.unshift(next.word);
+                    res.push(next.word);
                     if (limit && res.length >= limit) break;
                 }
             }
