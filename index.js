@@ -187,7 +187,8 @@ module.exports = function (order) {
     };
 
     self.readExternal = function(data) {
-        db = JSON.parse(data);
+        if (typeof data == 'object') db = data;
+        else db = JSON.parse(data);
     };
 
     self.writeExternal = function() {
