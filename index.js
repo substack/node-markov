@@ -185,6 +185,15 @@ module.exports = function (order) {
     self.word = function (cur) {
         return db[cur] && deck.pick(db[cur].words);
     };
+
+    self.readExternal = function(data) {
+        if (typeof data == 'object') db = data;
+        else db = JSON.parse(data);
+    };
+
+    self.writeExternal = function() {
+        return JSON.stringify(db);
+    };
     
     return self;
 };

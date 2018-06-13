@@ -121,3 +121,12 @@ generated if limit is specified.
 ---------------------
 
 Search for a starting key in `text` and then call `.fill(key, limit)` on it.
+
+.writeExternal()
+---------------------
+
+Returns a JSON.stringify version of the seeded markov chain for storage or resuse with the  `.readExternal()` function
+
+.readExternal(json)
+---------------------
+Imports a previously seeded markov chain
