@@ -8,6 +8,14 @@ module.exports = function (order) {
     var db = {};
     var self = {};
     
+    self.setDb = function (userDb) {
+      db = userDb;
+    }
+
+    self.getDb = function () {
+      return db;
+    }
+
     self.seed = function (seed, cb) {
         if (seed instanceof EventEmitter) {
             Lazy(seed).lines.forEach(self.seed);
