@@ -174,7 +174,7 @@ module.exports = function (order) {
             }
         }
         
-        return res;
+        return self.fill(cur,limit-res.length).concat(res);
     };
     
     self.respond = function (text, limit) {
